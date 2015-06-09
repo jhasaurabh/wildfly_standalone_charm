@@ -1,0 +1,32 @@
+#!/bin/bash
+set -e
+
+CWD=`dirname $0`
+TMPL=${CWD}/../templates
+
+juju-log " Installing openjdk-7"
+apt-get install openjdk-7-jre-headless -y
+juju-log " openjdk is installed "
+
+juju-log "Downloading wildfly CR1, this will take some time please be patient"
+
+wget http://download.jboss.org/wildfly/8.0.0.CR1/wildfly-8.0.0.CR1.tar.gz -O /tmp/wildfly-8.0.0.CR1.tar.gz
+wget http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.29.tar.gz -O /tmp/mysql-connector-java-5.1.29.tar.gz
+
+md5key1=`md5sum /tmp/mysql-connector-java-5.1.29.tar.gz | awk '{print $1}'`
+md5key2=`md5sum /tmp/wildfly-8.0.0.CR1.tar.gz | awk '{print $1}'`
+if [ $md5key2 == "edb681ee9e51da41047cdb9e7e7862c2" ] && [ $md5key1 == "58d44ae8d20fe86bba321640ea781c53" ]; then
+        juju-log "wildfly and mysql connecteor downloaded successfuly,without tampering. Continuing further now."
+
+        tar xvf /tmp/wildfly-8.0.0.CR1.tar.gz -C /opt
+        rm -rf /tmp/wildfly-8.0.0.CR1.tar.gz
+        mv /opt/wildfly* /opt/wildfly
+        cat ${TMPL}/standalone.xml >/opt/wildfly/standalone/configuration/standalone.xml
+	cp /opt/wildfly/bin/init.d/wildfly.conf /etc/default/wildfly
+	echo "JBOSS_USER=root" >>/etc/default/wildfly
+        cp /opt/wildfly/bin/init.d/wildfly-init-debian.sh /etc/init.d/wildfly
+        chmod +x /etc/init.d/wildfly
+else
+        echo "Download Incomplete, Terminating the charm deployment"
+	exit 1
+fi

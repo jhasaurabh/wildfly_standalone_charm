@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+username=`config-get username`
+password=`config-get password`
+if [ -z $password ]; then
+        hooks/stop
+        juju-log " wildfly stopped successfully"
+        hooks/start
+        juju-log " wildfly started successfully"
+else
+        sh /opt/wildfly/bin/add-user.sh --silent $username $password > /tmp/capture.log 2>&1
+        hooks/stop
+        juju-log " wildfly stopped successfully"
+        hooks/start
+        juju-log " wildfly started successfully"
+
+fi
+

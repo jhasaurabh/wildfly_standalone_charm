@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+juju-log " Starting wildfly apllication server"
+
+/etc/init.d/wildfly start
+
+#opening the required ports
+juju-log "Opening ports"
+
+open-port "25/tcp"
+open-port "9990/tcp"
+open-port "9999/tcp"
+open-port "8080/tcp"
+open-port "8443/tcp"
+

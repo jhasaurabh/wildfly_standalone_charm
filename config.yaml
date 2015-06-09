@@ -1,0 +1,12 @@
+options:
+  username:
+    type: string
+    default: "admin"
+    description: |
+      Username for the console user.
+  password:
+    type: string
+    default: ""
+    description: |
+      password for the console user.
+

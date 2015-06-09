@@ -1,0 +1,12 @@
+#!/bin/bash
+
+juju-log "database relation broken rolling back deployments"
+
+rm -rf /opt/wildfly/standalone/deployments/wildfly*
+
+juju-log "Deployments rolled back"
+
+juju-log "restarting wildfly"
+
+hooks/stop
+hooks/start

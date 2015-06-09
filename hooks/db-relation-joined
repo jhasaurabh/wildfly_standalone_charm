@@ -1,0 +1,21 @@
+#!/bin/bash
+set -e
+
+CWD=`dirname $0`
+TMPL=${CWD}/../templates
+
+if [ ! -f /opt/wildfly/modules/system/layers/base/com/mysql/main/mysql-connector-java-5.1.29-bin.jar ]; then
+juju-log "database added, deploying mysql connector now"
+
+tar xvf /tmp/mysql-connector-java-5.1.29.tar.gz -C /opt
+rm -rf /tmp/mysql-connector-java-5.1.29.tar.gz
+mv /opt/mysql* /opt/mysql        
+mkdir -p /opt/wildfly/modules/system/layers/base/com/mysql/main
+mv /opt/mysql/*jar /opt/wildfly/modules/system/layers/base/com/mysql/main
+cp ${TMPL}/module.xml /opt/wildfly/modules/system/layers/base/com/mysql/main/
+cat ${TMPL}/wildfly-ds.xml.bak >/opt/wildfly-ds.xml.bak
+
+else
+juju-log " mysql conector is deployed "
+fi
+hooks/stop

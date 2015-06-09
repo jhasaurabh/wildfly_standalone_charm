@@ -1,0 +1,36 @@
+#!/bin/bash
+set -e
+
+sleep 10
+CWD=`dirname $0`
+TMPL=${CWD}/../templates
+
+user=`relation-get user`
+password=`relation-get password`
+host=`relation-get host`
+database=`relation-get database`
+
+
+if [ ! -f /opt/wildfly/standalone/deployments/wildfly-ds.xml ]; then
+
+cat ${TMPL}/standalone2.xml >/opt/wildfly/standalone/configuration/standalone.xml
+sed "4 c "\<connection-url\>jdbc:mysql://$host:3306/test\</connection-url\>"" /opt/wildfly-ds.xml.bak >/tmp/ds.xml
+
+cat /tmp/ds.xml > /opt/wildfly-ds.xml.bak
+
+sed "13 c "\<user-name\>$user\</user-name\>"" /opt/wildfly-ds.xml.bak >/tmp/ds.xml
+
+cat /tmp/ds.xml > /opt/wildfly-ds.xml.bak
+
+sed "14 c "\<password\>$password\</password\>"" /opt/wildfly-ds.xml.bak >/tmp/ds.xml
+
+cat /tmp/ds.xml > /opt/wildfly-ds.xml.bak
+
+cp /opt/wildfly-ds.xml.bak /opt/wildfly/standalone/deployments/wildfly-ds.xml
+
+else
+juju-log "Database relation changed"
+
+fi
+
+hooks/start
